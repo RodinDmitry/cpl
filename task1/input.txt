@@ -1,0 +1,49 @@
+def fibonacchi 1 a
+move a REG1
+move 1 REG2
+if_eq
+move 0 REG3
+return
+endif
+move 2 REG2
+if_eq
+move 1 REG3
+return
+endif
+int f_1 0
+move a REG1
+move 1 REG2
+diff
+move REG3 f_1
+int f_2 0
+move 2 REG2
+move a REG1
+diff
+move REG3 f_2
+call fibonacchi f_1
+move REG3 f_1
+call fibonacchi f_2
+move REG3 REG1
+move f_1 REG2
+sum
+return
+end_function
+def main 0
+string hello "Enter number: "
+string res "Result: "
+string error "Invalid size"
+write_text hello
+read REG2
+int n 0
+move REG2 n
+move n REG1
+move 30 REG2
+if_more
+write_text error
+exit
+endif
+call fibonacchi n
+write_text res
+write REG3
+exit
+end_function
