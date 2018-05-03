@@ -47,19 +47,53 @@ public:
 	int c;
 };
 
+class E : public A {
+public:
 
+	E()
+	{
+		REGISTER_DERIVED_CLASS(1, STR(A));
+	}
+};
+
+class triangleA
+{
+public:
+	triangleA()
+	{
+		REGISTER_BASE_CLASS;
+	}
+	int a;
+};
+
+class triangleB : triangleA
+{
+public:
+	triangleB()
+	{
+		REGISTER_DERIVED_CLASS(1, STR(triangleA));
+	}
+};
+
+class triangleC : public triangleA, public triangleB
+{
+public:
+	triangleC()
+	{
+		REGISTER_DERIVED_CLASS(2, STR(triangleA), STR(triangleB));
+	}
+};
 
 int main()
 {
+
 	C inst;
 	C* ptr = &inst;
-	A* ptra = dynamic_cast<A*>(ptr);
+	triangleC instance;
+	triangleC* ptrC = &instance;
+	//triangleA*  ptrA = DYNAMIC_CAST(triangleA*, ptrC);
+	triangleA* statA = static_cast<triangleA*>(ptrC);
 
-	B* ptrb = dynamic_cast<B*>(ptr);
-	
-	std::cout << STR(decltype(ptr)) << std::endl;
-
-	A* testA = DYNAMIC_CAST(A*, ptr);
-
+	E* res = DYNAMIC_CAST(E*, ptr);
 	return 0;
 }

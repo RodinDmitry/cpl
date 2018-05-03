@@ -16,10 +16,12 @@ public:
 	static void AddInstance(void* instance, std::string name);
 	static void CreateBaseClass(std::string& name, int size);
 	static void CreateClass(std::string& name, int size, int numberOfParents, ...);
-	static int GetShift(void* instance, std::string target);
+	static bool GetShift(void* instance, std::string target, int& shift);
+	static void* Cast(void* instance, std::string target);
 	static std::string getName(void* instance);
 	static int getSize(std::string name);
 	static unsigned int getHash(std::string name);
+	
 
 private:
 

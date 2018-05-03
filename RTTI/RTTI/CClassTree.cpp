@@ -9,6 +9,9 @@ CClassTree::CClassTree()
 
 CClassTree::~CClassTree()
 {
+	for (auto node : nodes) {
+		delete node;
+	}
 }
 
 void CClassTree::AddInstance(void* instance, std::string name)
@@ -39,30 +42,49 @@ void CClassTree::CreateClass(std::string& name, int size, int numberOfParents, .
 	}
 }
 
-int CClassTree::GetShift(void* instance, std::string target)
+bool CClassTree::GetShift(void* instance, std::string target, int& shift)
 {
 	std::string start = manager.instanceToName[instance];
 	target = target.substr(0, target.size() - 1);
 	Node* startNode = manager.nameToNode[start];
 	Node* targetNode = manager.nameToNode[target];
+	if (startNode == nullptr || targetNode == nullptr) {
+		return false;
+	}
 	std::vector<Node*> upPath, downPath;
 	bool upCast = manager.isParent(targetNode, startNode, upPath);
 	bool downCast = manager.isParent(startNode, targetNode, downPath);
 	std::reverse(downPath.begin(), downPath.end());
-	int shift = 0;
+	shift = 0;
 	if (downCast) {
 		for (int i = 0; i < downPath.size() - 1; i++) {
 			shift += manager.castStep(downPath[i], downPath[i + 1]);
 		}
 		shift *= -1;
-	} 
+		return true;
+	}
 	if (upCast) {
 		for (int i = 0; i < upPath.size() - 1; i++) {
 			shift += manager.castStep(upPath[i], upPath[i + 1]);
 		}
+		return true;
 	}
 
-	return shift;
+	return false;
+}
+
+void * CClassTree::Cast(void* instance, std::string target)
+{
+	int shift = 0;
+	if (instance == nullptr) {
+		return nullptr;
+	}
+	bool result = GetShift(instance, target, shift);
+	if (!result) {
+		return nullptr;
+	}
+	return reinterpret_cast<char*>(instance) + shift;
+	
 }
 
 std::string CClassTree::getName(void* instance)
