@@ -38,6 +38,7 @@ private:
 
 	std::vector<Node*> nodes;
 	std::map<void*, std::string> instanceToName;
+	std::map<void*, void*> backwardSideCast; // cast to most derived ptr
 	std::map<std::string, Node*> nameToNode;
 
 
@@ -45,6 +46,7 @@ private:
 	void updateClass(Node* child, Node* parent);
 	bool isParent(Node* parent, Node* child, std::vector<Node*>& path);
 	int castStep(Node* parent, Node* child);
+	
 	
 };
 

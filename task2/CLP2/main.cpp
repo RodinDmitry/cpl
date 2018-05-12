@@ -19,7 +19,7 @@ void test1() // expected exit 5
 	NewObject obj;
 	THROW(5);
 	}
-		CATCH(4)
+		CATCH(1, 4)
 	}
 }
 
@@ -38,7 +38,7 @@ void func(int i)
 void test2()
 {
 	TRY func(0);
-	CATCH(1) std::cout << "Caught" << std::endl; }
+	CATCH(2, 1, 2) std::cout << "Caught" << std::endl; }
 }
 
 int main()
@@ -46,8 +46,6 @@ int main()
 
 	test2();
 	//test1();
-	{
-		NewObject obj;
-	}
+
 	return 0;
 }

@@ -12,7 +12,7 @@ Object::Object()
 }
 Object::~Object()
 {
-	objects.pop_back();
+	
 }
 
 void clearStack()
@@ -23,9 +23,29 @@ void clearStack()
 	for (int i = start; i >= end; i--) {
 		objects[i]->~Object();
 	}
+	for (int i = start; i >= end; i--) {
+		objects.pop_back();
+	}
 }
 
 void setStarkMark()
 {
 	stackMarks.push_back(objects.size());
+}
+
+void checkExeption(int exeption, int numExpected, ...)
+{
+	va_list expected; 
+	va_start(expected, numExpected); 
+		int expectedExeption = 0; 
+		for (int i = 0; i < numExpected; i++); { 
+			expectedExeption = va_arg(expected, int); 
+			if (expectedExeption != exeption) {
+				if (envs.size() == 0) {
+						
+						exit(exeption); 
+				} 
+				THROW(exeption); 
+			} 
+	}
 }

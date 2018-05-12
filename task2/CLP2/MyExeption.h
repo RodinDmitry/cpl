@@ -1,6 +1,8 @@
 #pragma once
 #include<vector>
 #include<csetjmp>
+#include<iostream>
+#include<stdarg.h>
 
 
 
@@ -18,6 +20,7 @@ extern bool isCatching;
 
 void clearStack();
 void setStarkMark();
+void checkExeption(int exeption, int numExpected, ...);
 
 #define TRY std::jmp_buf env; \
 	envs.push_back(&env); \
@@ -30,15 +33,11 @@ void setStarkMark();
 	exit(exeption); \
 	} \
 	isCatching = true; \
+	std::cout << envs.size() << std::endl; \
 	envs.pop_back(); \
 	clearStack(); \
 	longjmp(*env, exeption);
 
-#define CATCH(expected) } else { \
+#define CATCH(numExpected, ...) } else { \
 	isCatching = false; \
-	if (expected != exeption) { \
-		if (envs.size() == 0) { \
-			exit(exeption); \
-		} \
-		THROW(exeption); \
-	}
+	checkExeption(exeption, numExpected, __VA_ARGS__);

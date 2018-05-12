@@ -17,6 +17,13 @@ CClassTree::~CClassTree()
 void CClassTree::AddInstance(void* instance, std::string name)
 {
 	manager.instanceToName[instance] = name;
+	int numParents = manager.nameToNode[name]->parents.size();
+	char* base = reinterpret_cast<char*>(instance);
+	char* parent = base;
+	for (int i = 0; i < numParents; i++) {
+		manager.backwardSideCast[parent] = base;
+		parent += manager.nameToNode[name]->parents[i]->size;
+	}
 }
 
 void CClassTree::CreateBaseClass(std::string & name, int size)
@@ -54,7 +61,7 @@ bool CClassTree::GetShift(void* instance, std::string target, int& shift)
 	std::vector<Node*> upPath, downPath;
 	bool upCast = manager.isParent(targetNode, startNode, upPath);
 	bool downCast = manager.isParent(startNode, targetNode, downPath);
-	std::reverse(downPath.begin(), downPath.end());
+	std::reverse(upPath.begin(), upPath.end());
 	shift = 0;
 	if (downCast) {
 		for (int i = 0; i < downPath.size() - 1; i++) {
@@ -79,12 +86,12 @@ void * CClassTree::Cast(void* instance, std::string target)
 	if (instance == nullptr) {
 		return nullptr;
 	}
+	instance = manager.backwardSideCast[instance];
 	bool result = GetShift(instance, target, shift);
 	if (!result) {
 		return nullptr;
 	}
 	return reinterpret_cast<char*>(instance) + shift;
-	
 }
 
 std::string CClassTree::getName(void* instance)

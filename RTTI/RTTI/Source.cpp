@@ -66,13 +66,15 @@ public:
 	int a;
 };
 
-class triangleB : triangleA
+class triangleB
 {
 public:
 	triangleB()
 	{
-		REGISTER_DERIVED_CLASS(1, STR(triangleA));
+		REGISTER_BASE_CLASS;
 	}
+
+	int b = 0;
 };
 
 class triangleC : public triangleA, public triangleB
@@ -87,13 +89,13 @@ public:
 int main()
 {
 
-	C inst;
-	C* ptr = &inst;
 	triangleC instance;
 	triangleC* ptrC = &instance;
-	//triangleA*  ptrA = DYNAMIC_CAST(triangleA*, ptrC);
-	triangleA* statA = static_cast<triangleA*>(ptrC);
+	triangleA*  ptrA = DYNAMIC_CAST(triangleA*, ptrC);
+	triangleB*  ptrB = DYNAMIC_CAST(triangleB*, ptrC);
+	triangleB* testB = DYNAMIC_CAST(triangleB*, ptrA);
+	triangleA* testA = DYNAMIC_CAST(triangleA*, testB);
+	
 
-	E* res = DYNAMIC_CAST(E*, ptr);
-	return 0;
+  	return 0;
 }
