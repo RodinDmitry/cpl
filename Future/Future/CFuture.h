@@ -1,61 +1,39 @@
 #pragma once
-#include<functional>
-#include<condition_variable>
-#include<mutex>
-#include<atomic>
-#include<thread>
+#include"DelayedResult.h"
 
 template <class T>
 class CFuture
 {
 public:
 
-	CFuture() 
+	CFuture(DelayedResult<T>* res)
 	{
-		isReady.store(false);
-		hasExeption.store(false);
-	}
-
-	void SetValue(T* data)
-	{
-		std::unique_lock<std::mutex> lock(mut);
-		result = data;
-		isReady.store(true);
-		notification.notify_all();
-
-	}
-
-	void SetException(std::exception& error)
-	{
-		std::unique_lock<std::mutex> lock(mut);
-		exception = error;
-		hasExeption.store(true);
-		notification.notify_all();
+		result = res;
 	}
 
 	T* Get()
 	{ 
 		// waiting for the data
-		std::unique_lock<std::mutex> lock(mut);
-		while (!isReady.load() && !hasExeption.load()) {
-			notification.wait(lock);
+		std::unique_lock<std::mutex> lock(result->mut);
+		while (!result->isReady.load() && !result->hasExeption.load()) {
+			result->notification.wait(lock);
 		}
-		if (hasExeption.load()) {
-			throw exception;
+		if (result->hasExeption.load()) {
+			throw result->exception;
 		}
-		return result;
+		return result->result;
 	}
 
 	bool TryGet(T*& data)
 	{
-		if (hasExeption.load()) {
-			throw exception;
+		if (result->hasExeption.load()) {
+			throw result->exception;
 		}
-		if (!isReady.load()) {
+		if (!result->isReady.load()) {
 			return false;
 		}
-		std::unique_lock<std::mutex> lock(mut);
-		data = result;
+		std::unique_lock<std::mutex> lock(result->mut);
+		data = result->result;
 		return true;
 	}
 
@@ -63,14 +41,7 @@ public:
 
 private:
 
-	T* result;
-	std::atomic<bool> isReady;
-	std::atomic<bool> hasExeption;
-	std::mutex mut;
-	std::exception exception;
-	std::condition_variable notification;
-
-
+	DelayedResult<T>* result;
 
 };
 

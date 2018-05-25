@@ -18,6 +18,12 @@
     <ClInclude Include="CFuture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="CPromise.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DelayedResult.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source.cpp">

@@ -1,4 +1,5 @@
 #include"CFuture.h"
+#include"CPromise.h"
 #include<thread>
 #include<iostream>
 
@@ -12,16 +13,19 @@ int* foo()
 	return result;
 }
 
-void bar(CFuture<int>& future)
+void bar(CPromise<int>& promise)
 {
 	int* res = foo();
-	future.SetValue(res);
+	promise.SetValue(res);
 }
 
 void test()
 {
-	CFuture<int> future;
-	std::thread newThread(bar, std::ref(future));
+	DelayedResult<int> result;
+	CFuture<int> future(&result);
+	CPromise<int> promise(&result);
+
+	std::thread newThread(bar, std::ref(promise));
 	for (int i = 0; i < 10; i++) {
 		int* data;
 		bool result = future.TryGet(data);
@@ -35,20 +39,23 @@ void test()
 	newThread.join();
 }
 
-void bar2(CFuture<int>& future)
+
+void bar2(CPromise<int>& promise)
 {
 	try {
 		throw std::overflow_error("test");
 	}
 	catch (std::exception err) {
-		future.SetException(err);
+		promise.SetException(err);
 	}
 }
 
 void testException()
 {
-	CFuture<int> future;
-	std::thread newThread(bar2, std::ref(future));
+	DelayedResult<int> res;
+	CFuture<int> future(&res);
+	CPromise<int> promise(&res);
+	std::thread newThread(bar2, std::ref(promise));
 	newThread.join();
 	try
 	{
@@ -59,6 +66,7 @@ void testException()
 		std::cout << err.what() << std::endl;
 	}
 }
+
 
 int main()
 {
