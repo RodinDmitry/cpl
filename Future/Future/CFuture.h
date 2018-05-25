@@ -1,5 +1,6 @@
 #pragma once
 #include<functional>
+#include<condition_variable>
 #include<mutex>
 #include<atomic>
 #include<thread>
@@ -20,6 +21,7 @@ public:
 		std::unique_lock<std::mutex> lock(mut);
 		result = data;
 		isReady.store(true);
+		notification.notify_all();
 
 	}
 
@@ -28,18 +30,19 @@ public:
 		std::unique_lock<std::mutex> lock(mut);
 		exception = error;
 		hasExeption.store(true);
+		notification.notify_all();
 	}
 
 	T* Get()
 	{ 
 		// waiting for the data
+		std::unique_lock<std::mutex> lock(mut);
 		while (!isReady.load() && !hasExeption.load()) {
-			std::this_thread::yield();
+			notification.wait(lock);
 		}
 		if (hasExeption.load()) {
 			throw exception;
 		}
-		std::unique_lock<std::mutex> lock(mut);
 		return result;
 	}
 
@@ -65,6 +68,7 @@ private:
 	std::atomic<bool> hasExeption;
 	std::mutex mut;
 	std::exception exception;
+	std::condition_variable notification;
 
 
 
